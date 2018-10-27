@@ -1,0 +1,11 @@
+/Volumes/ExternalDrive/Regicide/Backend/DatabaseTests/src/DatabaseTests/bin/Debug/netcoreapp2.1/DatabaseTests.deps.json
+/Volumes/ExternalDrive/Regicide/Backend/DatabaseTests/src/DatabaseTests/bin/Debug/netcoreapp2.1/DatabaseTests.runtimeconfig.json
+/Volumes/ExternalDrive/Regicide/Backend/DatabaseTests/src/DatabaseTests/bin/Debug/netcoreapp2.1/DatabaseTests.runtimeconfig.dev.json
+/Volumes/ExternalDrive/Regicide/Backend/DatabaseTests/src/DatabaseTests/bin/Debug/netcoreapp2.1/DatabaseTests.dll
+/Volumes/ExternalDrive/Regicide/Backend/DatabaseTests/src/DatabaseTests/bin/Debug/netcoreapp2.1/DatabaseTests.pdb
+/Volumes/ExternalDrive/Regicide/Backend/DatabaseTests/src/DatabaseTests/obj/Debug/netcoreapp2.1/DatabaseTests.csprojAssemblyReference.cache
+/Volumes/ExternalDrive/Regicide/Backend/DatabaseTests/src/DatabaseTests/obj/Debug/netcoreapp2.1/DatabaseTests.csproj.CoreCompileInputs.cache
+/Volumes/ExternalDrive/Regicide/Backend/DatabaseTests/src/DatabaseTests/obj/Debug/netcoreapp2.1/DatabaseTests.AssemblyInfoInputs.cache
+/Volumes/ExternalDrive/Regicide/Backend/DatabaseTests/src/DatabaseTests/obj/Debug/netcoreapp2.1/DatabaseTests.AssemblyInfo.cs
+/Volumes/ExternalDrive/Regicide/Backend/DatabaseTests/src/DatabaseTests/obj/Debug/netcoreapp2.1/DatabaseTests.dll
+/Volumes/ExternalDrive/Regicide/Backend/DatabaseTests/src/DatabaseTests/obj/Debug/netcoreapp2.1/DatabaseTests.pdb
