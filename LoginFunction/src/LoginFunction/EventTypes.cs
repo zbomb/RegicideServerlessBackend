@@ -6,8 +6,8 @@ namespace LoginFunction
 
     public struct LoginRequest
     {
-        public string Username;
-        public string PassHash;
+        public string Username { get; set; }
+        public string PassHash { get; set; }
     }
 
     public enum LoginResult
@@ -20,9 +20,9 @@ namespace LoginFunction
 
     public struct LoginResponse
     {
-        public LoginResult Result;
-        public UInt32 Identifier;
-        public string AuthToken;
+        public LoginResult Result { get; set; }
+        public Regicide.API.Account Account { get; set; }
+        public string AuthToken { get; set; }
     }
 
     public enum DatabaseLookupResult

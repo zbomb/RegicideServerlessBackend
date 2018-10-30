@@ -1,0 +1,11 @@
+/Volumes/ExternalDrive/Regicide/Backend/S3Test/src/S3Test/bin/Release/netcoreapp2.1/rhel.7.2-x64/S3Test.deps.json
+/Volumes/ExternalDrive/Regicide/Backend/S3Test/src/S3Test/bin/Release/netcoreapp2.1/rhel.7.2-x64/S3Test.runtimeconfig.json
+/Volumes/ExternalDrive/Regicide/Backend/S3Test/src/S3Test/bin/Release/netcoreapp2.1/rhel.7.2-x64/S3Test.runtimeconfig.dev.json
+/Volumes/ExternalDrive/Regicide/Backend/S3Test/src/S3Test/bin/Release/netcoreapp2.1/rhel.7.2-x64/S3Test.dll
+/Volumes/ExternalDrive/Regicide/Backend/S3Test/src/S3Test/bin/Release/netcoreapp2.1/rhel.7.2-x64/S3Test.pdb
+/Volumes/ExternalDrive/Regicide/Backend/S3Test/src/S3Test/obj/Release/netcoreapp2.1/rhel.7.2-x64/S3Test.csprojAssemblyReference.cache
+/Volumes/ExternalDrive/Regicide/Backend/S3Test/src/S3Test/obj/Release/netcoreapp2.1/rhel.7.2-x64/S3Test.csproj.CoreCompileInputs.cache
+/Volumes/ExternalDrive/Regicide/Backend/S3Test/src/S3Test/obj/Release/netcoreapp2.1/rhel.7.2-x64/S3Test.AssemblyInfoInputs.cache
+/Volumes/ExternalDrive/Regicide/Backend/S3Test/src/S3Test/obj/Release/netcoreapp2.1/rhel.7.2-x64/S3Test.AssemblyInfo.cs
+/Volumes/ExternalDrive/Regicide/Backend/S3Test/src/S3Test/obj/Release/netcoreapp2.1/rhel.7.2-x64/S3Test.dll
+/Volumes/ExternalDrive/Regicide/Backend/S3Test/src/S3Test/obj/Release/netcoreapp2.1/rhel.7.2-x64/S3Test.pdb

@@ -6,10 +6,11 @@ using System.IO;
 using Amazon.Lambda.Core;
 using Amazon.KeyManagementService;
 using Amazon.KeyManagementService.Model;
- 
-using MySql.Data.MySqlClient;
 
-using Regicide.Auth;
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.Model;
+
+using Regicide.API;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -19,7 +20,8 @@ namespace LoginFunction
     public class Function
     {
         // Database
-        static string ConnectionString;
+        static AmazonDynamoDBClient Database;
+        static string TableName;
 
         // Token Provider
         static TokenManager TokenProvider;
@@ -32,27 +34,10 @@ namespace LoginFunction
 
         public Function()
         {
-            LambdaLogger.Log( "[Login] RUNNING CONSTRUCTOR" );
-            // Build Connection String
-            var SqlBuilder = new MySqlConnectionStringBuilder
-            {
-                Server = DecryptConfigValue( "db_endpoint" ),
-                UserID = DecryptConfigValue( "db_user" ),
-                Password = DecryptConfigValue( "db_password" ),
-                Port = Convert.ToUInt32( DecryptConfigValue( "db_port" ) ),
-                Database = DecryptConfigValue( "db_schema" ),
-                MinimumPoolSize = 0,
-                MaximumPoolSize = 1,
-                Pooling = true,
-                CharacterSet = "utf8mb4"
-            };
-
-            ConnectionString = SqlBuilder.ToString();
-
             byte[] SignatureKey = Encoding.UTF8.GetBytes( DecryptConfigValue( "auth_sigkey" ) );
             if( SignatureKey == null || SignatureKey.Length < 32 )
             {
-                LambdaLogger.Log( "[Login CRITICAL] Failed to read signature key from the config values!" );
+                LambdaLogger.Log( "[CRITICAL] Failed to read signature key from the config values!" );
             }
             else
             {
@@ -62,6 +47,14 @@ namespace LoginFunction
 
                 TokenProvider = new TokenManager( FinalKey );
             }
+
+            TableName = DecryptConfigValue( "db_table" );
+            if( String.IsNullOrWhiteSpace( TableName ) )
+            {
+                LambdaLogger.Log( "[CRITICAL] Failed to read table name from config values!" );
+            }
+
+            Database = new AmazonDynamoDBClient();
         }
 
 
@@ -122,38 +115,30 @@ namespace LoginFunction
                 return new LoginResponse()
                 {
                     Result = LoginResult.BadRequest,
-                    Identifier = 0,
-                    AuthToken = ""
+                    Account = null,
+                    AuthToken = String.Empty
                 };
             }
 
-            // Request appears to be valid.. so lets pass the request along to the database
-            bool bLookupResult = false;
-            UInt32 Identifier = 0;
+            // Request appears to be valid.. so lets lookup user info in the database
+            var Result = RegDatabase.PerformLogin( Username, Password, TableName, out Account LoadedAccount );
 
-            try
+            if( Result == RegDatabase.LoginResult.Error )
             {
-                bLookupResult = LookupAccountIdentifier( Username, Password, out Identifier );
-            }
-            catch( Exception )
-            {
-                // The exception should already be logged by the function, so we just need to respond to the client here
                 return new LoginResponse()
                 {
                     Result = LoginResult.DatabaseError,
-                    Identifier = 0,
-                    AuthToken = ""
+                    Account = null,
+                    AuthToken = String.Empty
                 };
             }
-
-            // Check if the credentials were not found
-            if( !bLookupResult )
+            if( Result == RegDatabase.LoginResult.Invalid )
             {
                 return new LoginResponse()
                 {
                     Result = LoginResult.InvalidCredentials,
-                    Identifier = 0,
-                    AuthToken = ""
+                    Account = null,
+                    AuthToken = String.Empty
                 };
             }
 
@@ -164,20 +149,20 @@ namespace LoginFunction
             string AuthToken = null;
             try
             {
-                AuthToken = GenerateAuthToken( Identifier );
+                AuthToken = GenerateAuthToken( Username.ToLower() );
 
                 if( String.IsNullOrWhiteSpace( AuthToken ) )
                     throw new Exception( "Generated token was null/empty" );
             }
             catch( Exception Ex )
             {
-                LambdaLogger.Log( String.Format( "[Login WARNING] GenerateAuthToken threw an exception! {0}", Ex.ToString() ) );
+                LambdaLogger.Log( String.Format( "[WARNING] GenerateAuthToken threw an exception! {0}", Ex.ToString() ) );
 
                 return new LoginResponse()
                 {
                     Result = LoginResult.DatabaseError,
-                    Identifier = 0,
-                    AuthToken = ""
+                    Account = null,
+                    AuthToken = String.Empty
                 };
             }
 
@@ -185,80 +170,9 @@ namespace LoginFunction
             return new LoginResponse()
             {
                 Result = LoginResult.Success,
-                Identifier = Identifier,
+                Account = LoadedAccount,
                 AuthToken = AuthToken
             };
-        }
-
-        /*===============================================================================
-         *  LookupAccountIdentifier( Username, Password, out Id )
-         * 
-         *  Performs an account lookup in the database, and returns the account id
-         *  for the specified account, if the password hash is correct
-        ===============================================================================*/
-        bool LookupAccountIdentifier( string inUser, string inPass, out UInt32 Identifier )
-        {
-            using( var Connection = new MySqlConnection( ConnectionString ) )
-            {
-                // Ensure the database connection is opened
-                try
-                {
-                    if( Connection.State == ConnectionState.Broken )
-                        Connection.Close();
-
-                    Connection.Open();
-                
-                }
-                catch( Exception Ex )
-                {
-                    LambdaLogger.Log( string.Format( "[Login ERROR] Failed to connect to database! {0}", Ex.Message ) );
-                    throw;
-                }
-
-                LambdaLogger.Log( "[Login] CONNECTED AT LookupAccountIdentifier" );
-
-                // Execute stored procedure for user login
-                using( var Command = new MySqlCommand( "AttemptLogin", Connection ) )
-                {
-                    Command.CommandType = CommandType.StoredProcedure;
-                    Command.Parameters.AddWithValue( "@inUsername", inUser ).Direction = ParameterDirection.Input;
-                    Command.Parameters.AddWithValue( "@inPassword", inPass ).Direction = ParameterDirection.Input;
-
-                    Command.Parameters.Add( "@outResult", MySqlDbType.Int32 ).Direction = ParameterDirection.Output;
-                    Command.Parameters.Add( "@outIdentifier", MySqlDbType.UInt32 ).Direction = ParameterDirection.Output;
-
-                    try
-                    {
-                        Command.ExecuteNonQuery();
-                    }
-                    catch( Exception Ex )
-                    {
-                        LambdaLogger.Log( string.Format( "[Login ERROR] Exception was thrown while performing login procedure! {0}", Ex.Message ) );
-                        throw;
-                    }
-
-                    LambdaLogger.Log( "[Login] RAN QUERY AT LookupAccountIdentifier" );
-
-                    int Result = Convert.ToInt32( Command.Parameters[ "@outResult" ].Value );
-
-                    // Check for abnormal error
-                    if( Result == (int) DatabaseLookupResult.Error )
-                    {
-                        throw new Exception( "Unknown database error!" );
-                    }
-
-                    // Check for invalid credentials
-                    if( Result == (int) DatabaseLookupResult.Invalid )
-                    {
-                        Identifier = 0;
-                        return false;
-                    }
-
-                    // Login was successful!
-                    Identifier = Convert.ToUInt32( Command.Parameters[ "@outIdentifier" ].Value );
-                    return true;
-                }
-            }
         }
 
 
@@ -269,7 +183,7 @@ namespace LoginFunction
         *   requests to access their account. This token can be stored indefinatley, 
         *   until the user calls Logout, or their password is changed.
         ===============================================================================*/
-        string GenerateAuthToken( UInt32 inUser )
+        string GenerateAuthToken( string inUser )
         {
             if( TokenProvider == null )
                 throw new Exception( "Token provider is null! Check config" );

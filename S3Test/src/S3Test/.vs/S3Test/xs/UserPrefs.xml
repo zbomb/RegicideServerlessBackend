@@ -1,7 +1,8 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workbench ActiveDocument="Function.cs">
     <Files>
-      <File FileName="Function.cs" Line="140" Column="14" />
+      <File FileName="Function.cs" Line="81" Column="32" />
+      <File FileName="RegicideAPI.cs" Line="591" Column="129" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />

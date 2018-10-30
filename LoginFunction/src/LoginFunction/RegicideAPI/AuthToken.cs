@@ -28,7 +28,7 @@ using Amazon.Lambda.Serialization.Json;
  *  before the first token is inserted into the database, but the probability is very low
 -----------------------------------------------------------------------------------------------------------*/
 
-namespace Regicide.Auth
+namespace Regicide.API
 {
     public struct AuthTokenInfo
     {
@@ -38,23 +38,23 @@ namespace Regicide.Auth
 
     public struct AuthUserInfo
     {
-        public UInt32 acc_id;
+        public string acc_id;
     }
 
     public class AuthToken
     {
-        public UInt32 UserId { get; set; }
+        public string UserId { get; set; }
         public long Expiration { get; set; }
         public long Issued { get; set; }
 
-        public AuthToken( UInt32 inUser, DateTime inExpr, DateTime inIssued )
+        public AuthToken( string inUser, DateTime inExpr, DateTime inIssued )
         {
             UserId = inUser;
             Expiration = inExpr.Ticks;
             Issued = inIssued.Ticks;
         }
 
-        public AuthToken( UInt32 inUser, long inExpr, long inIssued )
+        public AuthToken( string inUser, long inExpr, long inIssued )
         {
             UserId = inUser;
             Expiration = inExpr;
@@ -142,7 +142,7 @@ namespace Regicide.Auth
         {
             if( String.IsNullOrWhiteSpace( inToken ) )
                 return false;
-
+            
             var Validator = new RegexStringValidator( TokenFormat );
 
             try
