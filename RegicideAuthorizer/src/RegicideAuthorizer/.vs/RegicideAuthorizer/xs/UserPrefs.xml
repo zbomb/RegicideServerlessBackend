@@ -1,0 +1,16 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workbench ActiveDocument="Function.cs">
+    <Files>
+      <File FileName="Function.cs" Line="72" Column="10" />
+      <File FileName="EventTypes.cs" Line="8" Column="1" />
+      <File FileName="../../../RegicideAPI/AuthToken.cs" Line="91" Column="10" />
+      <File FileName="../../../RegicideAPI/Account.cs" Line="6" Column="23" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MultiItemStartupConfigurations />
+</Properties>

@@ -1,0 +1,20 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../../RegicideAPI/AccountSerializer.cs">
+    <Files>
+      <File FileName="Function.cs" Line="112" Column="58" />
+      <File FileName="../../../RegicideAPI/Login.cs" Line="9" Column="1" />
+      <File FileName="../../../RegicideAPI/AuthToken.cs" Line="103" Column="30" />
+      <File FileName="../../../RegicideAPI/Register.cs" Line="112" Column="43" />
+      <File FileName="../../../RegicideAPI/Account.cs" Line="6" Column="23" />
+      <File FileName="EventTypes.cs" Line="6" Column="12" />
+      <File FileName="aws-lambda-tools-defaults.json" Line="1" Column="1" />
+      <File FileName="../../../RegicideAPI/AccountSerializer.cs" Line="162" Column="29" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MultiItemStartupConfigurations />
+</Properties>

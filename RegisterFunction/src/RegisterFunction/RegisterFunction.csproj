@@ -9,6 +9,26 @@
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.Core" Version="1.0.0" />
     <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.4.0" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.14.11" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.26.4" />
+    <PackageReference Include="AWSSDK.SecretsManager" Version="3.3.2.18" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\..\..\RegicideAPI\AuthToken.cs">
+      <Link>RegicideAPI\AuthToken.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\RegicideAPI\Account.cs">
+      <Link>RegicideAPI\Account.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\RegicideAPI\Register.cs">
+      <Link>RegicideAPI\Register.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\RegicideAPI\AccountSerializer.cs">
+      <Link>RegicideAPI\AccountSerializer.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="RegicideAPI\" />
+  </ItemGroup>
 </Project>

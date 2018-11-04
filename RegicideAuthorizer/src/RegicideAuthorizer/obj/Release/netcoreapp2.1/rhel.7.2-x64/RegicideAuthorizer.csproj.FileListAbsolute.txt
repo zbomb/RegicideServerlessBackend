@@ -1,0 +1,11 @@
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/bin/Release/netcoreapp2.1/rhel.7.2-x64/RegicideAuthorizer.deps.json
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/bin/Release/netcoreapp2.1/rhel.7.2-x64/RegicideAuthorizer.runtimeconfig.json
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/bin/Release/netcoreapp2.1/rhel.7.2-x64/RegicideAuthorizer.runtimeconfig.dev.json
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/bin/Release/netcoreapp2.1/rhel.7.2-x64/RegicideAuthorizer.dll
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/bin/Release/netcoreapp2.1/rhel.7.2-x64/RegicideAuthorizer.pdb
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/obj/Release/netcoreapp2.1/rhel.7.2-x64/RegicideAuthorizer.csprojAssemblyReference.cache
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/obj/Release/netcoreapp2.1/rhel.7.2-x64/RegicideAuthorizer.csproj.CoreCompileInputs.cache
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/obj/Release/netcoreapp2.1/rhel.7.2-x64/RegicideAuthorizer.AssemblyInfoInputs.cache
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/obj/Release/netcoreapp2.1/rhel.7.2-x64/RegicideAuthorizer.AssemblyInfo.cs
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/obj/Release/netcoreapp2.1/rhel.7.2-x64/RegicideAuthorizer.dll
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/obj/Release/netcoreapp2.1/rhel.7.2-x64/RegicideAuthorizer.pdb

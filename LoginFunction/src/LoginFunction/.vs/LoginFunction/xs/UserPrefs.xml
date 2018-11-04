@@ -1,11 +1,12 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workbench ActiveDocument="RegicideAPI/Login.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="../../../RegicideAPI/Login.cs">
     <Files>
-      <File FileName="EventTypes.cs" Line="30" Column="19" />
-      <File FileName="Function.cs" Line="204" Column="13" />
+      <File FileName="EventTypes.cs" Line="33" Column="34" />
+      <File FileName="Function.cs" Line="65" Column="22" />
       <File FileName="Readme.md" Line="1" Column="1" />
-      <File FileName="RegicideAPI/Login.cs" Line="170" Column="13" />
-      <File FileName="RegicideAPI/AuthToken.cs" Line="2" Column="17" />
+      <File FileName="../../../RegicideAPI/AuthToken.cs" Line="23" Column="4" />
+      <File FileName="../../../RegicideAPI/Login.cs" Line="292" Column="14" />
+      <File FileName="../../../RegicideAPI/Account.cs" Line="38" Column="6" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />

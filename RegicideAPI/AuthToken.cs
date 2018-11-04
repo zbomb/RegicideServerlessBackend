@@ -1,10 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using System.Configuration;
+using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 
 using Amazon.Lambda.Serialization.Json;
+using Amazon.Lambda.Core;
 
 /*-----------------------------------------------------------------------------------------------------------
  *  Auth Tokens
@@ -39,6 +40,7 @@ namespace Regicide.API
     public struct AuthUserInfo
     {
         public string acc_id;
+        public string token_id;
     }
 
     public class AuthToken
@@ -46,26 +48,30 @@ namespace Regicide.API
         public string UserId { get; set; }
         public long Expiration { get; set; }
         public long Issued { get; set; }
+        public string TokenId { get; set; }
 
-        public AuthToken( string inUser, DateTime inExpr, DateTime inIssued )
+        public AuthToken( string inUser, DateTime inExpr, DateTime inIssued, string tokenId )
         {
             UserId = inUser;
             Expiration = inExpr.Ticks;
             Issued = inIssued.Ticks;
+            TokenId = tokenId;
         }
 
-        public AuthToken( string inUser, long inExpr, long inIssued )
+        public AuthToken( string inUser, long inExpr, long inIssued, string tokenId )
         {
             UserId = inUser;
             Expiration = inExpr;
             Issued = inIssued;
+            TokenId = tokenId;
         }
 
         public AuthToken()
         {
-            UserId = 0;
+            UserId = String.Empty;
             Expiration = 0;
             Issued = 0;
+            TokenId = String.Empty;
         }
     }
 
@@ -73,7 +79,7 @@ namespace Regicide.API
     {
         readonly byte[] Key;
         static readonly string TokenFormat = "^[A-Za-z0-9+/=]+.[A-Za-z0-9+/=]+.[A-Za-z0-9+/=]+$";
-        static readonly string AllowedIdChars = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890`~!@#$%^&*()_-+={[}]|:;<,>.?";
+        static readonly string AllowedIdChars = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890";
 
         public TokenManager( byte[] SignatureKey )
         {
@@ -81,15 +87,14 @@ namespace Regicide.API
         }
 
 
-        public bool ValidateSignature( string inToken, string inSalt )
+        public bool ValidateSignature( string inToken )
         {
             // First, lets check the basic format of the token
-            if( !ValidateFormat( inToken ) || String.IsNullOrWhiteSpace( inSalt ) )
+            if( !ValidateFormat( inToken ) )
                 return false;
 
-            byte[] SaltData = Encoding.UTF8.GetBytes( inSalt );
-            if( SaltData.Length < 32 )
-                return false;
+            if( Key.Length < 64 )
+                throw new Exception( "SigKey must be at least 64 bytes!" );
 
             // Now we can split the token up since we know its in the proper format
             string[] Chunks = inToken.Split( '.' );
@@ -103,12 +108,8 @@ namespace Regicide.API
                 byte[] UserInfo     = Convert.FromBase64String( Chunks[ 1 ] );
                 byte[] Signature    = Convert.FromBase64String( Chunks[ 2 ] );
 
-                byte[] FinalKey = new byte[ Key.Length + inSalt.Length ];
-                Array.ConstrainedCopy( Key, 0, FinalKey, 0, 32 );
-                Array.ConstrainedCopy( SaltData, 0, FinalKey, 32, 32 );
-
                 // Validate the signature using the key we have
-                using( var HMac = new HMACSHA256( FinalKey ) )
+                using( var HMac = new HMACSHA256( Key ) )
                 {
                     // Compute the hash of the token info + user info encoded as utf8 (no '.' character)
 
@@ -140,21 +141,7 @@ namespace Regicide.API
 
         public bool ValidateFormat( string inToken )
         {
-            if( String.IsNullOrWhiteSpace( inToken ) )
-                return false;
-            
-            var Validator = new RegexStringValidator( TokenFormat );
-
-            try
-            {
-                Validator.Validate( inToken );
-            }
-            catch( ArgumentException )
-            {
-                return false;
-            }
-
-            return true;
+            return !String.IsNullOrWhiteSpace( inToken ) && Regex.IsMatch( inToken, TokenFormat);
         }
 
 
@@ -200,20 +187,19 @@ namespace Regicide.API
             }
 
             // We wont verify contents, leave that for the caller to implement
-            return new AuthToken( UserInfo.acc_id, TokenInfo.expr, TokenInfo.issued );
+            return new AuthToken( UserInfo.acc_id, TokenInfo.expr, TokenInfo.issued, UserInfo.token_id );
         }
 
 
-        public string BuildToken( AuthToken Input, string inSalt )
+        public string BuildToken( AuthToken Input )
         {
             // Ensure we arent being passed null values, beyond that, the caller is responsible for the 
             // content of the token, as long as it doesnt cause us to error
-            if( Input == null || String.IsNullOrWhiteSpace( inSalt ) || Input.Expiration < DateTime.UtcNow.Ticks )
+            if( Input == null || Input.Expiration < DateTime.UtcNow.Ticks )
                 return null;
 
-            byte[] Salt = Encoding.UTF8.GetBytes( inSalt );
-            if( Salt.Length < 32 )
-                return null;
+            if( Key.Length < 64 )
+                throw new Exception( "TokenProvider key size too small" );
 
             // First, we need to split the data into two chunks, one for user info and the 
             // other is for token info
@@ -225,7 +211,8 @@ namespace Regicide.API
 
             AuthUserInfo UserInfo = new AuthUserInfo()
             {
-                acc_id = Input.UserId
+                acc_id = Input.UserId,
+                token_id = Input.TokenId
             };
 
             // Serialize the chunks using json
@@ -259,10 +246,6 @@ namespace Regicide.API
             // Now, we need to compute the signature to get the final chunk
             byte[] SigChunk = null;
 
-            byte[] FinalKey = new byte[ 64 ];
-            Array.ConstrainedCopy( Key, 0, FinalKey, 0, 32 );
-            Array.ConstrainedCopy( Salt, 0, FinalKey, 32, 32 );
-
             using( var HMac = new HMACSHA256( Key ) )
             {
                 byte[] TokenData = new byte[ TokenChunk.Length + UserChunk.Length ];
@@ -280,13 +263,13 @@ namespace Regicide.API
         }
 
 
-        public string GenerateTokenSalt()
+        public string GenerateTokenId()
         {
             byte[] RandomBytes = new byte[ 1 ];
             using( var RNG = new RNGCryptoServiceProvider() )
             {
                 RNG.GetNonZeroBytes( RandomBytes );
-                RandomBytes = new byte[ 32 ];
+                RandomBytes = new byte[ 16 ];
                 RNG.GetNonZeroBytes( RandomBytes );
             }
 

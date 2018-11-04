@@ -1,0 +1,11 @@
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/bin/Release/netcoreapp2.1/rhel.7.2-x64/LogoutFunction.deps.json
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/bin/Release/netcoreapp2.1/rhel.7.2-x64/LogoutFunction.runtimeconfig.json
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/bin/Release/netcoreapp2.1/rhel.7.2-x64/LogoutFunction.runtimeconfig.dev.json
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/bin/Release/netcoreapp2.1/rhel.7.2-x64/LogoutFunction.dll
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/bin/Release/netcoreapp2.1/rhel.7.2-x64/LogoutFunction.pdb
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/obj/Release/netcoreapp2.1/rhel.7.2-x64/LogoutFunction.csprojAssemblyReference.cache
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/obj/Release/netcoreapp2.1/rhel.7.2-x64/LogoutFunction.csproj.CoreCompileInputs.cache
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/obj/Release/netcoreapp2.1/rhel.7.2-x64/LogoutFunction.AssemblyInfoInputs.cache
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/obj/Release/netcoreapp2.1/rhel.7.2-x64/LogoutFunction.AssemblyInfo.cs
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/obj/Release/netcoreapp2.1/rhel.7.2-x64/LogoutFunction.dll
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/obj/Release/netcoreapp2.1/rhel.7.2-x64/LogoutFunction.pdb

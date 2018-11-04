@@ -1,0 +1,11 @@
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/obj/Debug/netcoreapp2.1/RegicideAuthorizer.csprojAssemblyReference.cache
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/obj/Debug/netcoreapp2.1/RegicideAuthorizer.csproj.CoreCompileInputs.cache
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/obj/Debug/netcoreapp2.1/RegicideAuthorizer.AssemblyInfoInputs.cache
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/obj/Debug/netcoreapp2.1/RegicideAuthorizer.AssemblyInfo.cs
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/bin/Debug/netcoreapp2.1/RegicideAuthorizer.deps.json
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/bin/Debug/netcoreapp2.1/RegicideAuthorizer.runtimeconfig.json
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/bin/Debug/netcoreapp2.1/RegicideAuthorizer.runtimeconfig.dev.json
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/bin/Debug/netcoreapp2.1/RegicideAuthorizer.dll
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/bin/Debug/netcoreapp2.1/RegicideAuthorizer.pdb
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/obj/Debug/netcoreapp2.1/RegicideAuthorizer.dll
+/Volumes/ExternalDrive/Regicide/Backend/RegicideAuthorizer/src/RegicideAuthorizer/obj/Debug/netcoreapp2.1/RegicideAuthorizer.pdb

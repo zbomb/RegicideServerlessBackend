@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
@@ -8,66 +11,19 @@ using Amazon.Lambda.Core;
 
 namespace Regicide.API
 {
-    public class Account
-    {
-        public BasicAccountInfo Info { get; set; }
-        public List<Card> Cards { get; set; }
-        public List<Deck> Decks { get; set; }
-        public List<Achievement> Achievements { get; set; }
-
-        public Account()
-        {
-            Info = null;
-            Cards = null;
-            Decks = null;
-            Achievements = null;
-        }
-    }
-
-    public class BasicAccountInfo
+    public class LoginParameters
     {
         public string Username { get; set; }
-        public string Email { get; set; }
-        public UInt64 Coins { get; set; }
-        public string DisplayName { get; set; }
-        public bool Verified { get; set; }
-        public string Token { get; set; }
+        public string PassHash { get; set; }
+        public string DynTable { get; set; }
+        public string TokenId { get; set; }
+        public byte[] PassSalt { get; set; }
+        public AmazonDynamoDBClient Database { get; set; }
     }
-
-    public class Card
-    {
-        public UInt16 Identifier { get; set; }
-        public UInt16 Count { get; set; }
-    }
-
-    public class Deck
-    {
-        public UInt16 Identifier { get; set; }
-        public string DisplayName { get; set; }
-
-        public List<Card> Cards { get; set; }
-    }
-
-    public class Achievement
-    {
-        public UInt16 Identifier { get; set; }
-        public bool Complete { get; set; }
-        public Int32 State { get; set; }
-    }
-
-    public enum AccountProperty
-    {
-        Info = 0,
-        Cards = 1,
-        Decks = 2,
-        Achievements = 3,
-        All = 4
-    }
-
 
     public static class RegDatabase
     {
-        private enum AccountEntry
+        enum AccountEntry
         {
             BasicInfo = 0,
             CardsLower = 1,
@@ -79,24 +35,6 @@ namespace Regicide.API
             // This allows us to store all decks, as properties of the main account
         }
 
-        static AmazonDynamoDBClient DatabaseClient;
-
-        public static void Init()
-        {
-            if( DatabaseClient != null )
-            {
-                return;
-            }
-
-            DatabaseClient = new AmazonDynamoDBClient();
-        }
-
-        public static void Dispose()
-        {
-            DatabaseClient?.Dispose();
-            DatabaseClient = null;
-        }
-
         public enum LoginResult
         {
             Error = 0,
@@ -104,17 +42,34 @@ namespace Regicide.API
             Success = 2
         }
 
-        public static LoginResult PerformLogin( string Username, string PassHash, string inTable, string inToken, out Account Info )
-        {
-            if( DatabaseClient == null )
-                Init();
+        // Constant Values
+        static readonly int UsernameMinLength = 5;
+        static readonly int UsernameMaxLength = 32;
+        //static readonly int PasswordHashLength = 44;
 
+        public static LoginResult PerformLogin( LoginParameters Params, out Account Info )
+        {
             Info = null;
+
+            // Perform basic validation to try and catch easy failures before sending request over to database
+            if( String.IsNullOrWhiteSpace( Params.Username ) || String.IsNullOrWhiteSpace( Params.PassHash ) ||
+               Params.Username.Length < UsernameMinLength || Params.Username.Length > UsernameMaxLength ||
+               Params.PassHash.Length < 40 || !Regex.IsMatch( Params.Username, "^[a-zA-Z0-9_-]+$" ) )
+            {
+                return LoginResult.Invalid;
+            } 
+
+            string Username = Params.Username.ToLower();
+
+            // Rehash password
+            string PassHash = Utils.HashPassword( Params.PassHash, Params.PassSalt );
+            if( String.IsNullOrEmpty( PassHash ) || PassHash.Length < 32 )
+                throw new Exception( "Failed to re-hash password!" );
 
             // Update the token and retrieve the basic account info in a single call to reducde api calls
             var UpReq = new UpdateItemRequest()
             {
-                TableName = inTable,
+                TableName = Params.DynTable,
                 ReturnValues = ReturnValue.ALL_NEW,
                 Key =
                 {
@@ -130,13 +85,26 @@ namespace Regicide.API
                 },
                 ExpressionAttributeValues =
                 {
-                    { ":in_token", new AttributeValue { S = inToken } },
+                    { ":in_token", new AttributeValue { S = Params.TokenId } },
                     { ":in_pwd", new AttributeValue { S = PassHash } }
                 },
             };
 
-            var UpdTask = DatabaseClient.UpdateItemAsync( UpReq );
-            UpdTask.Wait();
+            Task< UpdateItemResponse > UpdTask;
+            try
+            {
+                UpdTask = Params.Database.UpdateItemAsync( UpReq );
+                UpdTask.Wait();
+            }
+            catch( AggregateException Ex )
+            {
+                if( Ex.GetBaseException() is ConditionalCheckFailedException condEx )
+                {
+                    return LoginResult.Invalid;
+                }
+
+                throw;
+            }
 
             var UpdResult = UpdTask.Result;
 
@@ -150,9 +118,9 @@ namespace Regicide.API
             // Okay, we logged in properly, now we need to query all of the account info for this user and serialize it
             var TotalQuery = new QueryRequest()
             {
-                TableName = inTable,
+                TableName = Params.DynTable,
                 ConsistentRead = true,
-                KeyConditionExpression = "#u = :in_user and #pr != :basic_prop",
+                KeyConditionExpression = "#u = :in_user and #pr > :basic_prop",
                 ExpressionAttributeNames =
                 {
                     { "#u", "User" },
@@ -160,32 +128,31 @@ namespace Regicide.API
                 },
                 ExpressionAttributeValues =
                 {
-                    { ":in_user", new AttributeValue { S = Username.ToLower() } },
+                    { ":in_user", new AttributeValue { S = Username } },
                     { ":basic_prop", new AttributeValue { N = ( (int) AccountEntry.BasicInfo ).ToString() } }
                 }
             };
 
-            var TotalTask = DatabaseClient.QueryAsync( TotalQuery );
+            var TotalTask = Params.Database.QueryAsync( TotalQuery );
             TotalTask.Wait();
 
             var FullAccount = TotalTask.Result;
 
             if( FullAccount?.Items == null || FullAccount.Count == 0 )
             {
+                // TODO: Should throw exception?
                 LambdaLogger.Log( String.Format( "[ERROR] Account '{0}' logged in successfully.. but the full account couldnt be queried!", Username ) );
                 return LoginResult.Error;
             }
 
             var LoadedAccount = new Account
             {
-                Info = ProcessAccountInfo( UpdResult.Attributes, Username ),
-                Cards = new List<Card>(),
-                Decks = new List<Deck>(),
-                Achievements = new List<Achievement>()
+                Info = ProcessAccountInfo( UpdResult.Attributes, Username )
             };
 
             if( LoadedAccount.Info == null )
             {
+                // TODO: Should throw exception?
                 LambdaLogger.Log( String.Format( "[ERROR] Account '{0}' logged in successfully.. but the basic account info couldnt be parsed!", Username ) );
                 return LoginResult.Error;
             }
@@ -197,25 +164,41 @@ namespace Regicide.API
                 {
                     var Cards = ProcessCardList( Property, Username );
                     if( Cards != null )
+                    {
+                        if( LoadedAccount.Cards == null )
+                            LoadedAccount.Cards = new List<Card>();
+
                         LoadedAccount.Cards.AddRange( Cards );
+                    }
                 }
                 else if( Property[ "Property" ].N == ( (int) AccountEntry.Achievements ).ToString() )
                 {
                     var Achvs = ProcessAchievementList( Property, Username );
                     if( Achvs != null )
+                    {
+                        if( LoadedAccount.Achievements == null )
+                            LoadedAccount.Achievements = new List<Achievement>();
+
                         LoadedAccount.Achievements = Achvs;
+                    }
                 }
                 else if( Int32.Parse( Property[ "Property" ].N ) > 4 )
                 {
                     var NewDeck = ProcessDeck( Property, Username );
                     if( NewDeck != null )
+                    {
+                        if( LoadedAccount.Decks == null )
+                            LoadedAccount.Decks = new List<Deck>();
+
                         LoadedAccount.Decks.Add( NewDeck );
+                    }
                 }
             }
 
             // TODO: Re-evalute this, should we check if cards were loaded? What if a user doesnt have cards? Should we not allow users to have no cards?
-            if( LoadedAccount.Cards.Count == 0 )
+            if( LoadedAccount.Cards == null || LoadedAccount.Cards.Count == 0 )
             {
+                // TODO: Should throw exception?
                 LambdaLogger.Log( String.Format( "[ERROR] Account '{0}' logged in.. but the card list couldnt be loaded!", Username ) );
                 return LoginResult.Error;
             }
@@ -281,8 +264,7 @@ namespace Regicide.API
                 Coins = Coins,
                 Email = Result[ "Email" ].S,
                 DisplayName = Result[ "DispName" ].S,
-                Username = Result[ "User" ].S,
-                Token = Result[ "Token" ].S
+                Username = Result[ "User" ].S
             };
 
             Info.Verified = Result.ContainsKey( "Verify" ) && Result[ "Verify" ].BOOL;
@@ -325,8 +307,8 @@ namespace Regicide.API
                 // Add card to list
                 Output.Add( new Card()
                 {
-                    Identifier = Identifier,
-                    Count = Count
+                    Id = Identifier,
+                    Ct = Count
                 } );
             }
 
@@ -362,8 +344,8 @@ namespace Regicide.API
             // The deck doesnt necisarily need to contain cards, so we wont error if it doesnt
             var Output = new Deck()
             {
-                Identifier = (UInt16) ( PropertyNumber - 4 ),
-                DisplayName = Result[ "DispName" ].S,
+                Id = (UInt16) ( PropertyNumber - 4 ),
+                Name = Result[ "DispName" ].S,
                 Cards = new List<Card>()
             };
 
@@ -373,20 +355,20 @@ namespace Regicide.API
                 {
                     if( !UInt16.TryParse( CardInfo.Key, out UInt16 CardId ) || CardId <= 0 )
                     {
-                        Console.WriteLine( "[RegAPI] Warning! Account '{0}' has a deck '{1}' with an invalid card! (ID) Key: {2}", Username, Output.DisplayName, CardInfo.Key );
+                        Console.WriteLine( "[RegAPI] Warning! Account '{0}' has a deck '{1}' with an invalid card! (ID) Key: {2}", Username, Output.Name, CardInfo.Key );
                         continue;
                     }
 
                     if( !UInt16.TryParse( CardInfo.Value.N, out UInt16 Count ) || Count <= 0 )
                     {
-                        Console.WriteLine( "[RegAPI] Warning! Account '{0}' has a deck '{1}' with an invalid card! (COUNT) Value: {2}", Username, Output.DisplayName, CardInfo.Value.N );
+                        Console.WriteLine( "[RegAPI] Warning! Account '{0}' has a deck '{1}' with an invalid card! (COUNT) Value: {2}", Username, Output.Name, CardInfo.Value.N );
                         continue;
                     }
 
                     Output.Cards.Add( new Card()
                     {
-                        Identifier = CardId,
-                        Count = Count
+                        Id = CardId,
+                        Ct = Count
                     } );
                 }
             }
@@ -433,7 +415,7 @@ namespace Regicide.API
                 }
 
                 // Check if we already have an achievement with this id
-                if( Output.Exists( X => X.Identifier == AchvId ) )
+                if( Output.Exists( X => X.Id == AchvId ) )
                 {
                     Console.WriteLine( "[RegAPI] Warning! Account '{0}' has duplicate achievements in database! Id: {1}", Username, AchvId );
                     continue;
@@ -441,7 +423,7 @@ namespace Regicide.API
 
                 Output.Add( new Achievement()
                 {
-                    Identifier = AchvId,
+                    Id = AchvId,
                     State = State,
                     Complete = AchvInfo.M[ "cp" ].BOOL
                 } );

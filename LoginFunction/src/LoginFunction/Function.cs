@@ -1,14 +1,14 @@
 using System;
 using System.Text;
-using System.Data;
+using System.Text.RegularExpressions;
 using System.IO;
 
 using Amazon.Lambda.Core;
-using Amazon.KeyManagementService;
-using Amazon.KeyManagementService.Model;
+
+using Amazon.SecretsManager;
+using Amazon.SecretsManager.Model;
 
 using Amazon.DynamoDBv2;
-using Amazon.DynamoDBv2.Model;
 
 using Regicide.API;
 
@@ -23,67 +23,69 @@ namespace LoginFunction
         static AmazonDynamoDBClient Database;
         static string TableName;
 
-        // Token Provider
+        // Authorization
         static TokenManager TokenProvider;
+        static byte[] PassSalt;
 
-        // Constant Values
-        static readonly int UsernameMinLength   = 5;
-        static readonly int UsernameMaxLength   = 32;
-        static readonly int PasswordHashLength  = 44;
-
+        struct Config
+        {
+            public string table { get; set; }
+            public string sigkey { get; set; }
+            public string salt { get; set; }
+        }
 
         public Function()
         {
-            byte[] SignatureKey = Encoding.UTF8.GetBytes( DecryptConfigValue( "auth_sigkey" ) );
-            if( SignatureKey == null || SignatureKey.Length < 32 )
-            {
-                LambdaLogger.Log( "[CRITICAL] Failed to read signature key from the config values!" );
-            }
-            else
-            {
-                // Make sure key is exactly 64 bytes
-                byte[] FinalKey = new byte[ 32 ];
-                Array.ConstrainedCopy( SignatureKey, 0, FinalKey, 0, 32 );
-
-                TokenProvider = new TokenManager( FinalKey );
-            }
-
-            TableName = DecryptConfigValue( "db_table" );
-            if( String.IsNullOrWhiteSpace( TableName ) )
-            {
-                LambdaLogger.Log( "[CRITICAL] Failed to read table name from config values!" );
-            }
-
+            // Create database instance
             Database = new AmazonDynamoDBClient();
+
+            // Load config from secret manager
+            using( var Secrets = new AmazonSecretsManagerClient() )
+            {
+                var SecTask = Secrets.GetSecretValueAsync( new GetSecretValueRequest { SecretId = "api/salt" } );
+                SecTask.Wait();
+
+                var SecResult   = SecTask.Result;
+                var Serializer  = new Amazon.Lambda.Serialization.Json.JsonSerializer();
+                Config LoadedConfig;
+
+                if( SecResult.SecretString != null )
+                {
+                    using( var Stream = new MemoryStream( Encoding.UTF8.GetBytes( SecResult.SecretString ) ) )
+                    {
+                        Stream.Position = 0;
+                        LoadedConfig = Serializer.Deserialize<Config>( Stream );
+                    }
+                }
+                else
+                {
+                    using( SecResult.SecretBinary )
+                    {
+                        LoadedConfig = Serializer.Deserialize<Config>( SecResult.SecretBinary );
+                    }
+                }
+
+                // Validate and retrieve values
+                if( String.IsNullOrEmpty( LoadedConfig.salt ) || String.IsNullOrEmpty( LoadedConfig.sigkey ) || String.IsNullOrEmpty( LoadedConfig.table ) )
+                    throw new Exception( "Failed to read config from secret manager!" );
+
+                PassSalt = Encoding.UTF8.GetBytes( LoadedConfig.salt );
+                if( PassSalt.Length < 32 )
+                    throw new Exception( "Failed to read password salt from secrets manager!" );
+
+                byte[] SigKey = Encoding.UTF8.GetBytes( LoadedConfig.sigkey );
+                if( SigKey.Length < 64 )
+                    throw new Exception( "Failed to read sigkey from secrets manager!" );
+
+                TokenProvider = new TokenManager( SigKey );
+                TableName = LoadedConfig.table;
+            }
         }
 
 
-        static string DecryptConfigValue( string inName )
+        ~Function()
         {
-            var EncryptedData = Convert.FromBase64String( Environment.GetEnvironmentVariable( inName ) );
-
-            using( var KeyClient = new AmazonKeyManagementServiceClient() )
-            {
-                var Request = new DecryptRequest()
-                {
-                    CiphertextBlob = new MemoryStream( EncryptedData )
-                };
-
-                var ResponseTask = KeyClient.DecryptAsync( Request );
-                ResponseTask.Wait();
-
-                var Response = ResponseTask.Result;
-
-                using( var DataStream = Response.Plaintext )
-                {
-                    string Output = Encoding.UTF8.GetString( DataStream.ToArray() );
-
-                    if( Output == null )
-                        throw new Exception( "Output was null!" );
-
-                    return Output;
-                }
-            }
+            Database?.Dispose();
         }
 
         /*===============================================================================
@@ -91,7 +93,9 @@ namespace LoginFunction
         ===============================================================================*/
         public LoginResponse Login( LoginRequest Request, ILambdaContext Context )
         {
-            return PerformLogin( Request );
+            return Request.PassHash == null || Request.Username == null
+                ? new LoginResponse { Result = LoginResult.BadRequest, Account = null, AuthToken = null }
+                : PerformLogin( Request );
         }
 
 
@@ -104,24 +108,27 @@ namespace LoginFunction
          ======================================================================================*/
         LoginResponse PerformLogin( LoginRequest Request )
         {
-            string Username = Request.Username;
-            string Password = Request.PassHash;
+            // Generate a new token for this user
+            // When a new token is generated, the old token will be no longer usable
+            // Since we store the salt used in verification with the account info,
+            // the old token will fail verification because the salt will be incorrect
+            var AuthToken = GenerateAuthToken( Request.Username.ToLower(), out string outId );
 
-            // Perform basic validation to try and catch easy failures before sending request over to database
-            if( String.IsNullOrWhiteSpace( Username ) || String.IsNullOrWhiteSpace( Password ) ||
-               Username.Length < UsernameMinLength || Username.Length > UsernameMaxLength ||
-               Password.Length != PasswordHashLength )
+            if( String.IsNullOrWhiteSpace( AuthToken ) )
+                throw new Exception( "Generated token was null/empty" );
+
+            var LoginReq = new LoginParameters()
             {
-                return new LoginResponse()
-                {
-                    Result = LoginResult.BadRequest,
-                    Account = null,
-                    AuthToken = String.Empty
-                };
-            }
+                Username = Request.Username,
+                PassHash = Request.PassHash,
+                TokenId  = outId,
+                DynTable = TableName,
+                PassSalt = PassSalt,
+                Database = Database
+            };
 
             // Request appears to be valid.. so lets lookup user info in the database
-            var Result = RegDatabase.PerformLogin( Username, Password, TableName, out Account LoadedAccount );
+            var Result = RegDatabase.PerformLogin( LoginReq, out Account LoadedAccount );
 
             if( Result == RegDatabase.LoginResult.Error )
             {
@@ -129,7 +136,7 @@ namespace LoginFunction
                 {
                     Result = LoginResult.DatabaseError,
                     Account = null,
-                    AuthToken = String.Empty
+                    AuthToken = null
                 };
             }
             if( Result == RegDatabase.LoginResult.Invalid )
@@ -138,31 +145,7 @@ namespace LoginFunction
                 {
                     Result = LoginResult.InvalidCredentials,
                     Account = null,
-                    AuthToken = String.Empty
-                };
-            }
-
-            // Generate a new token for this user
-            // When a new token is generated, the old token will be no longer usable
-            // Since we store the salt used in verification with the account info,
-            // the old token will fail verification because the salt will be incorrect
-            string AuthToken = null;
-            try
-            {
-                AuthToken = GenerateAuthToken( Username.ToLower() );
-
-                if( String.IsNullOrWhiteSpace( AuthToken ) )
-                    throw new Exception( "Generated token was null/empty" );
-            }
-            catch( Exception Ex )
-            {
-                LambdaLogger.Log( String.Format( "[WARNING] GenerateAuthToken threw an exception! {0}", Ex.ToString() ) );
-
-                return new LoginResponse()
-                {
-                    Result = LoginResult.DatabaseError,
-                    Account = null,
-                    AuthToken = String.Empty
+                    AuthToken = null
                 };
             }
 
@@ -183,7 +166,7 @@ namespace LoginFunction
         *   requests to access their account. This token can be stored indefinatley, 
         *   until the user calls Logout, or their password is changed.
         ===============================================================================*/
-        string GenerateAuthToken( string inUser )
+        string GenerateAuthToken( string inUser, out string outId )
         {
             if( TokenProvider == null )
                 throw new Exception( "Token provider is null! Check config" );
@@ -192,41 +175,13 @@ namespace LoginFunction
             {
                 Issued = DateTime.UtcNow.Ticks,
                 Expiration = ( DateTime.UtcNow + new TimeSpan( 365, 0, 0, 0, 0 ) ).Ticks,
-                UserId = inUser
+                UserId = inUser,
+                TokenId = TokenProvider.GenerateTokenId()
             };
 
-            // Generate a unique identifier string for this auth token
-            // This will be tied to this users account
-            // If, for some reason, we generate an id thats already in use, we will loop again and generate a new one
-            // Once the token is definatley unique, the procedure will update the account with it, and return success code
-            string Salt = TokenProvider.GenerateTokenSalt();
-
-            using( var Database = new MySqlConnection( ConnectionString ) )
-            {
-                Database.Open();
-
-                LambdaLogger.Log( "[Login] CONNECTED AT GenerateAuthToken" );
-
-                using( var Command = new MySqlCommand( "UPDATE Accounts SET ActiveToken=@salt WHERE Identifier=@uid LIMIT 1", Database ) )
-                {
-                    Command.Parameters.AddWithValue( "@salt", Salt );
-                    Command.Parameters.AddWithValue( "@uid", inUser );
-
-                    try
-                    {
-                        Command.ExecuteNonQuery();
-                    }
-                    catch( Exception )
-                    {
-                        // Fails if we cant set the active token, since its needed to verify
-                        return null;
-                    }
-
-                    LambdaLogger.Log( "[Login] COMPLETED QUERY AT GenerateAuthToken" );
-                }
-            }
-
-            return TokenProvider.BuildToken( NewToken, Salt );
+            // Give the token id back so we can insert it into the database
+            outId = NewToken.TokenId;
+            return TokenProvider.BuildToken( NewToken );
         }
 
 

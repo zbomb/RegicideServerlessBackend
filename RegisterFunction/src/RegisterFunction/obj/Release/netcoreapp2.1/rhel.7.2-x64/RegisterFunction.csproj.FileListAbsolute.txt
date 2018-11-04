@@ -1,0 +1,11 @@
+/Volumes/ExternalDrive/Regicide/Backend/RegisterFunction/src/RegisterFunction/bin/Release/netcoreapp2.1/rhel.7.2-x64/RegisterFunction.deps.json
+/Volumes/ExternalDrive/Regicide/Backend/RegisterFunction/src/RegisterFunction/bin/Release/netcoreapp2.1/rhel.7.2-x64/RegisterFunction.runtimeconfig.json
+/Volumes/ExternalDrive/Regicide/Backend/RegisterFunction/src/RegisterFunction/bin/Release/netcoreapp2.1/rhel.7.2-x64/RegisterFunction.runtimeconfig.dev.json
+/Volumes/ExternalDrive/Regicide/Backend/RegisterFunction/src/RegisterFunction/bin/Release/netcoreapp2.1/rhel.7.2-x64/RegisterFunction.dll
+/Volumes/ExternalDrive/Regicide/Backend/RegisterFunction/src/RegisterFunction/bin/Release/netcoreapp2.1/rhel.7.2-x64/RegisterFunction.pdb
+/Volumes/ExternalDrive/Regicide/Backend/RegisterFunction/src/RegisterFunction/obj/Release/netcoreapp2.1/rhel.7.2-x64/RegisterFunction.csprojAssemblyReference.cache
+/Volumes/ExternalDrive/Regicide/Backend/RegisterFunction/src/RegisterFunction/obj/Release/netcoreapp2.1/rhel.7.2-x64/RegisterFunction.csproj.CoreCompileInputs.cache
+/Volumes/ExternalDrive/Regicide/Backend/RegisterFunction/src/RegisterFunction/obj/Release/netcoreapp2.1/rhel.7.2-x64/RegisterFunction.AssemblyInfoInputs.cache
+/Volumes/ExternalDrive/Regicide/Backend/RegisterFunction/src/RegisterFunction/obj/Release/netcoreapp2.1/rhel.7.2-x64/RegisterFunction.AssemblyInfo.cs
+/Volumes/ExternalDrive/Regicide/Backend/RegisterFunction/src/RegisterFunction/obj/Release/netcoreapp2.1/rhel.7.2-x64/RegisterFunction.dll
+/Volumes/ExternalDrive/Regicide/Backend/RegisterFunction/src/RegisterFunction/obj/Release/netcoreapp2.1/rhel.7.2-x64/RegisterFunction.pdb

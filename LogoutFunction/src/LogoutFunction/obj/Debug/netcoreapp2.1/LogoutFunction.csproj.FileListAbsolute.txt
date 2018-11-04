@@ -1,0 +1,11 @@
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/bin/Debug/netcoreapp2.1/LogoutFunction.deps.json
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/bin/Debug/netcoreapp2.1/LogoutFunction.runtimeconfig.json
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/bin/Debug/netcoreapp2.1/LogoutFunction.runtimeconfig.dev.json
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/bin/Debug/netcoreapp2.1/LogoutFunction.dll
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/bin/Debug/netcoreapp2.1/LogoutFunction.pdb
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/obj/Debug/netcoreapp2.1/LogoutFunction.csprojAssemblyReference.cache
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/obj/Debug/netcoreapp2.1/LogoutFunction.csproj.CoreCompileInputs.cache
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/obj/Debug/netcoreapp2.1/LogoutFunction.AssemblyInfoInputs.cache
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/obj/Debug/netcoreapp2.1/LogoutFunction.AssemblyInfo.cs
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/obj/Debug/netcoreapp2.1/LogoutFunction.dll
+/Volumes/ExternalDrive/Regicide/Backend/LogoutFunction/src/LogoutFunction/obj/Debug/netcoreapp2.1/LogoutFunction.pdb

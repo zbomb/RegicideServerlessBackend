@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.1/rhel.7.2-x64",
-    "signature": "01c3425d00c01483389ebe78f1145c575a761617"
+    "signature": "902b32bbcb16010dbff8de1efa0415de054962fd"
   },
   "compilationOptions": {},
   "targets": {
@@ -9,10 +9,10 @@
     ".NETCoreApp,Version=v2.1/rhel.7.2-x64": {
       "LoginFunction/1.0.0": {
         "dependencies": {
-          "AWSSDK.KeyManagementService": "3.3.6.13",
+          "AWSSDK.DynamoDBv2": "3.3.14.11",
+          "AWSSDK.SecretsManager": "3.3.2.18",
           "Amazon.Lambda.Core": "1.0.0",
-          "Amazon.Lambda.Serialization.Json": "1.4.0",
-          "MySql.Data": "8.0.13"
+          "Amazon.Lambda.Serialization.Json": "1.4.0"
         },
         "runtime": {
           "LoginFunction.dll": {}
@@ -45,7 +45,7 @@
           }
         }
       },
-      "AWSSDK.Core/3.3.28.1": {
+      "AWSSDK.Core/3.3.29.3": {
         "dependencies": {
           "Microsoft.CSharp": "4.0.1",
           "System.Net.Requests": "4.0.11",
@@ -56,26 +56,29 @@
         "runtime": {
           "lib/netstandard1.3/AWSSDK.Core.dll": {
             "assemblyVersion": "3.3.0.0",
-            "fileVersion": "3.3.28.1"
+            "fileVersion": "3.3.29.3"
           }
         }
       },
-      "AWSSDK.KeyManagementService/3.3.6.13": {
+      "AWSSDK.DynamoDBv2/3.3.14.11": {
         "dependencies": {
-          "AWSSDK.Core": "3.3.28.1"
+          "AWSSDK.Core": "3.3.29.3"
         },
         "runtime": {
-          "lib/netstandard1.3/AWSSDK.KeyManagementService.dll": {
+          "lib/netstandard1.3/AWSSDK.DynamoDBv2.dll": {
             "assemblyVersion": "3.3.0.0",
-            "fileVersion": "3.3.6.13"
+            "fileVersion": "3.3.14.11"
           }
         }
       },
-      "Google.Protobuf/3.5.1": {
+      "AWSSDK.SecretsManager/3.3.2.18": {
+        "dependencies": {
+          "AWSSDK.Core": "3.3.29.3"
+        },
         "runtime": {
-          "lib/netstandard1.0/Google.Protobuf.dll": {
-            "assemblyVersion": "3.5.1.0",
-            "fileVersion": "3.5.1.0"
+          "lib/netstandard1.3/AWSSDK.SecretsManager.dll": {
+            "assemblyVersion": "3.3.0.0",
+            "fileVersion": "3.3.2.18"
           }
         }
       },
@@ -97,20 +100,6 @@
           "System.Runtime.Extensions": "4.1.0",
           "System.Runtime.InteropServices": "4.1.0",
           "System.Threading": "4.0.11"
-        }
-      },
-      "MySql.Data/8.0.13": {
-        "dependencies": {
-          "Google.Protobuf": "3.5.1",
-          "System.Configuration.ConfigurationManager": "4.4.1",
-          "System.Security.Permissions": "4.4.1",
-          "System.Text.Encoding.CodePages": "4.4.0"
-        },
-        "runtime": {
-          "lib/netcoreapp2.0/MySql.Data.dll": {
-            "assemblyVersion": "8.0.13.0",
-            "fileVersion": "8.0.13.0"
-          }
         }
       },
       "Newtonsoft.Json/9.0.1": {
@@ -165,17 +154,6 @@
           "System.Runtime.Extensions": "4.1.0",
           "System.Threading": "4.0.11",
           "System.Threading.Tasks": "4.0.11"
-        }
-      },
-      "System.Configuration.ConfigurationManager/4.4.1": {
-        "dependencies": {
-          "System.Security.Cryptography.ProtectedData": "4.4.0"
-        },
-        "runtime": {
-          "lib/netstandard2.0/System.Configuration.ConfigurationManager.dll": {
-            "assemblyVersion": "4.0.0.0",
-            "fileVersion": "4.6.25921.2"
-          }
         }
       },
       "System.Console/4.0.0": {
@@ -456,11 +434,6 @@
           "System.Runtime": "4.1.0"
         }
       },
-      "System.Security.AccessControl/4.4.0": {
-        "dependencies": {
-          "System.Security.Principal.Windows": "4.4.0"
-        }
-      },
       "System.Security.Cryptography.Algorithms/4.2.0": {
         "dependencies": {
           "System.Collections": "4.0.11",
@@ -550,14 +523,6 @@
           "System.Threading.Tasks": "4.0.11"
         }
       },
-      "System.Security.Cryptography.ProtectedData/4.4.0": {
-        "runtime": {
-          "lib/netstandard2.0/System.Security.Cryptography.ProtectedData.dll": {
-            "assemblyVersion": "4.0.2.0",
-            "fileVersion": "4.6.25519.3"
-          }
-        }
-      },
       "System.Security.Cryptography.X509Certificates/4.1.0": {
         "dependencies": {
           "System.Collections": "4.0.11",
@@ -586,29 +551,9 @@
           "runtime.native.System.Security.Cryptography": "4.0.0"
         }
       },
-      "System.Security.Permissions/4.4.1": {
-        "dependencies": {
-          "System.Security.AccessControl": "4.4.0"
-        },
-        "runtime": {
-          "lib/netstandard2.0/System.Security.Permissions.dll": {
-            "assemblyVersion": "4.0.0.0",
-            "fileVersion": "4.6.25921.2"
-          }
-        }
-      },
-      "System.Security.Principal.Windows/4.4.0": {},
       "System.Text.Encoding/4.0.11": {
         "dependencies": {
           "System.Runtime": "4.1.0"
-        }
-      },
-      "System.Text.Encoding.CodePages/4.4.0": {
-        "runtime": {
-          "lib/netstandard2.0/System.Text.Encoding.CodePages.dll": {
-            "assemblyVersion": "4.1.0.0",
-            "fileVersion": "4.6.25519.3"
-          }
         }
       },
       "System.Text.Encoding.Extensions/4.0.11": {
@@ -707,26 +652,26 @@
       "path": "amazon.lambda.serialization.json/1.4.0",
       "hashPath": "amazon.lambda.serialization.json.1.4.0.nupkg.sha512"
     },
-    "AWSSDK.Core/3.3.28.1": {
+    "AWSSDK.Core/3.3.29.3": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-4LvND/YE5bNRQBcFjDsTZ4dUZn1s45ZMo0enj/jaSlP9V7JZLr1bil06iHR7EczTSCXOhpGbXxmeBbWeOb74aw==",
-      "path": "awssdk.core/3.3.28.1",
-      "hashPath": "awssdk.core.3.3.28.1.nupkg.sha512"
+      "sha512": "sha512-qfB1UPFTd0CcynSlFDiSolYi0QnB7raaP2df6BMXlxVz18r7UN5gpHkWOiCzRrd8pvMw/B5Azp97vbHplWXoGQ==",
+      "path": "awssdk.core/3.3.29.3",
+      "hashPath": "awssdk.core.3.3.29.3.nupkg.sha512"
     },
-    "AWSSDK.KeyManagementService/3.3.6.13": {
+    "AWSSDK.DynamoDBv2/3.3.14.11": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-O2dvCm0gT0xZ2DifwqEGC7RPWLaHeVC0nLlvU/mV1ToSLQt0oYQ1KF/Gk8wVKGTj96Kn5fWiHgygmL8jxiptfw==",
-      "path": "awssdk.keymanagementservice/3.3.6.13",
-      "hashPath": "awssdk.keymanagementservice.3.3.6.13.nupkg.sha512"
+      "sha512": "sha512-MdzIuNqha/WXIfjYu8BF1tc3hXRdF9MeLBbR5QL2wP8L5VTzPmq/k7NYu2sB68pwIsu05dyUBk1Ml3VBDB/+sw==",
+      "path": "awssdk.dynamodbv2/3.3.14.11",
+      "hashPath": "awssdk.dynamodbv2.3.3.14.11.nupkg.sha512"
     },
-    "Google.Protobuf/3.5.1": {
+    "AWSSDK.SecretsManager/3.3.2.18": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-j/gbpRZ68sgvdi/vXI39Cj/jWG4d1dtDqfWbkjC9dErNWu/dFcIlq1LIgLscea+llZ6nzm06wz/JGziOegAL7Q==",
-      "path": "google.protobuf/3.5.1",
-      "hashPath": "google.protobuf.3.5.1.nupkg.sha512"
+      "sha512": "sha512-zt8qNKc/cxJZ2M7i9BLUsKS8VRRFzmNxvqB6G5HzFUzKXxdzTFfRqKWFedCscXNhruLz88U3kiW1ur7NN2rEWw==",
+      "path": "awssdk.secretsmanager/3.3.2.18",
+      "hashPath": "awssdk.secretsmanager.3.3.2.18.nupkg.sha512"
     },
     "Microsoft.CSharp/4.0.1": {
       "type": "package",
@@ -734,13 +679,6 @@
       "sha512": "sha512-17h8b5mXa87XYKrrVqdgZ38JefSUqLChUQpXgSnpzsM0nDOhE40FTeNWOJ/YmySGV6tG6T8+hjz6vxbknHJr6A==",
       "path": "microsoft.csharp/4.0.1",
       "hashPath": "microsoft.csharp.4.0.1.nupkg.sha512"
-    },
-    "MySql.Data/8.0.13": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-mXfjg2pOdzpyd4wkXZPKYcNluzV68ggAO/LPcT7iuzU5kDS7livUDR8IsKkarEhBmRxBy0XmBnUOkEWJvfOW9Q==",
-      "path": "mysql.data/8.0.13",
-      "hashPath": "mysql.data.8.0.13.nupkg.sha512"
     },
     "Newtonsoft.Json/9.0.1": {
       "type": "package",
@@ -783,13 +721,6 @@
       "sha512": "sha512-2gBcbb3drMLgxlI0fBfxMA31ec6AEyYCHygGse4vxceJan8mRIWeKJ24BFzN7+bi/NFTgdIgufzb94LWO5EERQ==",
       "path": "system.collections.concurrent/4.0.12",
       "hashPath": "system.collections.concurrent.4.0.12.nupkg.sha512"
-    },
-    "System.Configuration.ConfigurationManager/4.4.1": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-LoSjM/kLDpyLyoGsmwS5oVMRzHf/0XHkRpr3QZu/HuAv6Sfk919usTMLqD9N9VK3S4Q2+bd3tKJ0ko4MYFfq4Q==",
-      "path": "system.configuration.configurationmanager/4.4.1",
-      "hashPath": "system.configuration.configurationmanager.4.4.1.nupkg.sha512"
     },
     "System.Console/4.0.0": {
       "type": "package",
@@ -1022,13 +953,6 @@
       "path": "system.runtime.serialization.primitives/4.1.1",
       "hashPath": "system.runtime.serialization.primitives.4.1.1.nupkg.sha512"
     },
-    "System.Security.AccessControl/4.4.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-UPF+s4KctOCpk7dpBe3QtZ1AzFEHKdhOtiNDLxGnD/nxKsVbsow5OClTy8c7yOObw/Evbv95xRwZfYZ4wLV4fA==",
-      "path": "system.security.accesscontrol/4.4.0",
-      "hashPath": "system.security.accesscontrol.4.4.0.nupkg.sha512"
-    },
     "System.Security.Cryptography.Algorithms/4.2.0": {
       "type": "package",
       "serviceable": true,
@@ -1071,13 +995,6 @@
       "path": "system.security.cryptography.primitives/4.0.0",
       "hashPath": "system.security.cryptography.primitives.4.0.0.nupkg.sha512"
     },
-    "System.Security.Cryptography.ProtectedData/4.4.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-WwEexvBd+17yfY7fcS+fBGl+HADEfCJuKeDJqBT7D6j6vKwYvfLyGuq2y/MmrKORC6mbYwth7kjinO1mPhTL3g==",
-      "path": "system.security.cryptography.protecteddata/4.4.0",
-      "hashPath": "system.security.cryptography.protecteddata.4.4.0.nupkg.sha512"
-    },
     "System.Security.Cryptography.X509Certificates/4.1.0": {
       "type": "package",
       "serviceable": true,
@@ -1085,33 +1002,12 @@
       "path": "system.security.cryptography.x509certificates/4.1.0",
       "hashPath": "system.security.cryptography.x509certificates.4.1.0.nupkg.sha512"
     },
-    "System.Security.Permissions/4.4.1": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-tXBMO8OJEuw9c4KjLj4fwxJusely90azF24Uktz/evgvowAtU963HYl+G93gaRZr6pvYvsSPrjkN4+2pdVUbgw==",
-      "path": "system.security.permissions/4.4.1",
-      "hashPath": "system.security.permissions.4.4.1.nupkg.sha512"
-    },
-    "System.Security.Principal.Windows/4.4.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-yNxhQZ5oJb2Q7VqNj1Af6e+9KXzHcXJdv+eE+1Lp2+FYBwmVLQs2LfQpeSfz5RxorwlV0EpNbkLatPScb+XEWw==",
-      "path": "system.security.principal.windows/4.4.0",
-      "hashPath": "system.security.principal.windows.4.4.0.nupkg.sha512"
-    },
     "System.Text.Encoding/4.0.11": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-U3gGeMlDZXxCEiY4DwVLSacg+DFWCvoiX+JThA/rvw37Sqrku7sEFeVBBBMBnfB6FeZHsyDx85HlKL19x0HtZA==",
       "path": "system.text.encoding/4.0.11",
       "hashPath": "system.text.encoding.4.0.11.nupkg.sha512"
-    },
-    "System.Text.Encoding.CodePages/4.4.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-epF1P00AFbqPy5jZx3fpEn5qwlBDZ+dck71xYc/jLibfY6BtoFKOqoj84YHcQWV9HcWb7M13aVJ61XCdK8/3XA==",
-      "path": "system.text.encoding.codepages/4.4.0",
-      "hashPath": "system.text.encoding.codepages.4.4.0.nupkg.sha512"
     },
     "System.Text.Encoding.Extensions/4.0.11": {
       "type": "package",
