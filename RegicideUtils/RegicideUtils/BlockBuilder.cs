@@ -6,13 +6,14 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 using Newtonsoft.Json;
+using ICSharpCode.SharpZipLib.GZip;
+
 
 namespace RegicideUtils
 {
     struct ContentInfo
     {
         public string Path;
-        public string Identifier;
         public string TargetPath;
         public long Begin;
         public long End;
@@ -143,19 +144,6 @@ namespace RegicideUtils
                     continue;
                 }
 
-                Console.WriteLine( "Enter Id For This File: " );
-                Console.Write( "> " );
-
-                string inId = Console.ReadLine()?.Trim()?.ToLower();
-                if( inId == "q" || inId == "quit" )
-                    return true;
-
-                if( String.IsNullOrEmpty( inId ) )
-                {
-                    Console.WriteLine( "Canceling this file!" );
-                    continue;
-                }
-
                 Console.WriteLine( "Enter Deploy Path: " );
                 Console.Write( "> " );
 
@@ -171,11 +159,11 @@ namespace RegicideUtils
 
                 ContentInfo newInfo = new ContentInfo();
                 newInfo.Path = inFile;
-                newInfo.Identifier = inId;
                 newInfo.TargetPath = inPath;
 
                 Files.Add( newInfo );
                 Console.WriteLine( "=> '{0}' added to block!", newInfo.Path );
+                Console.WriteLine( "" );
             }
 
             if( Files.Count == 0 )
@@ -222,23 +210,18 @@ namespace RegicideUtils
                 ContentInfo newInfo = new ContentInfo()
                 {
                     TargetPath = Files[ i ].TargetPath,
-                    Identifier = Files[ i ].Identifier,
                     Begin = CurrentOffset,
                     End = CurrentOffset + Data.Length
                 };
 
                 Console.WriteLine( "=> Packed file '{0}' ({1} bytes)", Files[ i ].Path, Data.Length );
+                Console.WriteLine( "" );
+
                 Output.Add( newInfo );
-                Array.ConstrainedCopy( Data, 0, FinalBlob, (int)newInfo.Begin, (int)newInfo.End );
-            }
+                Array.ConstrainedCopy( Data, 0, FinalBlob, (int)newInfo.Begin, Data.Length );
 
-            // Now we need to compute the hash for this block
-            string Hash = null;
-
-            using( var SHA = SHA256.Create() )
-            {
-                byte[] HashData = SHA.ComputeHash( FinalBlob );
-                Hash = Encoding.UTF8.GetString( HashData );
+                // Advance Offset
+                CurrentOffset += Data.Length;
             }
 
             // Create Json header
@@ -252,8 +235,6 @@ namespace RegicideUtils
                 jWrite.WriteStartObject();
                 jWrite.WritePropertyName( "Id" );
                 jWrite.WriteValue( Identifier );
-                jWrite.WritePropertyName( "Hash" );
-                jWrite.WriteValue( Hash );
 
                 jWrite.WritePropertyName( "Files" );
                 jWrite.WriteStartArray();
@@ -265,9 +246,9 @@ namespace RegicideUtils
                     jWrite.WritePropertyName( "File" );
                     jWrite.WriteValue( F.TargetPath );
                     jWrite.WritePropertyName( "Begin" );
-                    jWrite.WriteValue( F.Begin.ToString() );
+                    jWrite.WriteValue( F.Begin );
                     jWrite.WritePropertyName( "End" );
-                    jWrite.WriteValue( F.End.ToString() );
+                    jWrite.WriteValue( F.End );
                     jWrite.WriteEndObject();
                 }
 
@@ -290,9 +271,62 @@ namespace RegicideUtils
             Array.ConstrainedCopy( HeaderData, 0, FinalFile, 4, HeaderLength );
             Array.ConstrainedCopy( FinalBlob, 0, FinalFile, HeaderLength + 4, FinalBlob.Length );
 
+            Console.WriteLine( "=> Block built.." );
+
+            // Compute hash of the block
+            string Hash;
+            using( var SHA = SHA256.Create() )
+            {
+                Hash = Convert.ToBase64String( SHA.ComputeHash( FinalFile ) );
+            }
+
+            Console.WriteLine( "=> Block hashed.." );
+
+            // Compress the block
+            byte[] CompressedFile = null;
+            using( var inStream = new MemoryStream( FinalFile ) )
+            {
+                using( var outStream = new MemoryStream() )
+                {
+                    GZip.Compress( inStream, outStream, true );
+                    CompressedFile = outStream.ToArray();
+                }
+            }
+
+            Console.WriteLine( "=> Block compressed ({0} bytes -> {1} bytes)", FinalFile.Length, CompressedFile.Length );
+
             // Finally, write to file
-            File.WriteAllBytes( LocalPath + OutputFile, FinalFile );
-            Console.WriteLine( "=> New block written! {0}", LocalPath + OutputFile );
+            File.WriteAllBytes( LocalPath + OutputFile, CompressedFile );
+            Console.WriteLine( "=> New block written! {0} ({1} bytes)", LocalPath + OutputFile, CompressedFile.Length );
+
+            // Create json data that needs to be added to the mainfest
+            StringBuilder sb = new StringBuilder();
+            StringWriter wr = new StringWriter( sb );
+            using( JsonWriter jWrite = new JsonTextWriter( wr ) )
+            {
+                jWrite.Formatting = Formatting.Indented;
+
+                jWrite.WriteComment( "Manually generated block. Add to the 'Entries' list in the manifest." );
+                jWrite.WriteRaw( "\n" );
+                jWrite.WriteStartObject();
+                jWrite.WritePropertyName( "URL" );
+                jWrite.WriteValue( "<URL Path>" );
+                jWrite.WritePropertyName( "Id" );
+                jWrite.WriteValue( Identifier );
+                jWrite.WritePropertyName( "Hash" );
+                jWrite.WriteValue( Hash );
+                jWrite.WritePropertyName( "Size" );
+                jWrite.WriteValue( CompressedFile.Length );
+                jWrite.WriteEndObject();
+            }
+
+            string ManifestEntry = sb.ToString();
+
+            string noExt = OutputFile.Remove( OutputFile.LastIndexOf( '.' ) );
+            File.WriteAllText( LocalPath + noExt + "_manifest.txt", ManifestEntry );
+            Console.WriteLine( "=> Wrote manifest entry! {0}", LocalPath + noExt + "_manifest.txt" );
+            Console.WriteLine( "=> Complete!" );
+            Console.WriteLine( "" );
             return true;
 
         }
