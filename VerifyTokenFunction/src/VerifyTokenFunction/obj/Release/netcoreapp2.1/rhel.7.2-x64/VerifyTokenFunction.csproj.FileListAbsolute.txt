@@ -1,0 +1,11 @@
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/bin/Release/netcoreapp2.1/rhel.7.2-x64/VerifyTokenFunction.deps.json
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/bin/Release/netcoreapp2.1/rhel.7.2-x64/VerifyTokenFunction.runtimeconfig.json
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/bin/Release/netcoreapp2.1/rhel.7.2-x64/VerifyTokenFunction.runtimeconfig.dev.json
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/bin/Release/netcoreapp2.1/rhel.7.2-x64/VerifyTokenFunction.dll
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/bin/Release/netcoreapp2.1/rhel.7.2-x64/VerifyTokenFunction.pdb
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/obj/Release/netcoreapp2.1/rhel.7.2-x64/VerifyTokenFunction.csprojAssemblyReference.cache
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/obj/Release/netcoreapp2.1/rhel.7.2-x64/VerifyTokenFunction.csproj.CoreCompileInputs.cache
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/obj/Release/netcoreapp2.1/rhel.7.2-x64/VerifyTokenFunction.AssemblyInfoInputs.cache
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/obj/Release/netcoreapp2.1/rhel.7.2-x64/VerifyTokenFunction.AssemblyInfo.cs
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/obj/Release/netcoreapp2.1/rhel.7.2-x64/VerifyTokenFunction.dll
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/obj/Release/netcoreapp2.1/rhel.7.2-x64/VerifyTokenFunction.pdb

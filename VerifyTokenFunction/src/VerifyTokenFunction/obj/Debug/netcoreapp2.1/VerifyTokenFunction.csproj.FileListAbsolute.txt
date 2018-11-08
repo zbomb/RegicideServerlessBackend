@@ -1,0 +1,11 @@
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/bin/Debug/netcoreapp2.1/VerifyTokenFunction.deps.json
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/bin/Debug/netcoreapp2.1/VerifyTokenFunction.runtimeconfig.json
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/bin/Debug/netcoreapp2.1/VerifyTokenFunction.runtimeconfig.dev.json
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/bin/Debug/netcoreapp2.1/VerifyTokenFunction.dll
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/bin/Debug/netcoreapp2.1/VerifyTokenFunction.pdb
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/obj/Debug/netcoreapp2.1/VerifyTokenFunction.csprojAssemblyReference.cache
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/obj/Debug/netcoreapp2.1/VerifyTokenFunction.csproj.CoreCompileInputs.cache
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/obj/Debug/netcoreapp2.1/VerifyTokenFunction.AssemblyInfoInputs.cache
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/obj/Debug/netcoreapp2.1/VerifyTokenFunction.AssemblyInfo.cs
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/obj/Debug/netcoreapp2.1/VerifyTokenFunction.dll
+/Volumes/ExternalDrive/Regicide/Backend/VerifyTokenFunction/src/VerifyTokenFunction/obj/Debug/netcoreapp2.1/VerifyTokenFunction.pdb

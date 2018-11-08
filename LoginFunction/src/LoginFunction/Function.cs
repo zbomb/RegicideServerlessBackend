@@ -108,6 +108,19 @@ namespace LoginFunction
          ======================================================================================*/
         LoginResponse PerformLogin( LoginRequest Request )
         {
+            // Check passhash integrety
+            Span<byte> _1 = new Span<byte>();
+            if( String.IsNullOrWhiteSpace( Request.PassHash ) || 
+               !Convert.TryFromBase64String( Request.PassHash, _1, out int _2 ) )
+            {
+                return new LoginResponse()
+                {
+                    Result = LoginResult.BadRequest,
+                    Account = null,
+                    AuthToken = null
+                };
+            }
+
             // Generate a new token for this user
             // When a new token is generated, the old token will be no longer usable
             // Since we store the salt used in verification with the account info,

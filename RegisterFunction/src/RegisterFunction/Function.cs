@@ -150,6 +150,19 @@ namespace RegisterFunction
             if( PassSalt == null || PassSalt.Length < 32 )
                 throw new Exception( "Password salt not set!" ); // Throw exception when this container is bad
 
+            // Check if password appears valid, otherwise it will throw an exception
+            Span<byte> _1 = new Span<byte>();
+            if( String.IsNullOrWhiteSpace( Password ) || 
+               !Convert.TryFromBase64String( Password, _1, out int _2 ) )
+            {
+                return new RegisterResponse()
+                {
+                    Result = RegisterResult.BadPassHash,
+                    Account = null,
+                    Token = null
+                };
+            }
+
             // Generate Auth Token
             string AuthToken = null;
             string TokenId = null;
